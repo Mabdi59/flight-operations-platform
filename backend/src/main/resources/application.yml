@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: flight-operations-platform
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/flightops}
+    username: ${SPRING_DATASOURCE_USERNAME:flightops}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  cache:
+    type: ${SPRING_CACHE_TYPE:simple}
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: operations-platform
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: com.flightops.platform.event
+        spring.json.value.default.type: com.flightops.platform.event.FlightEvent
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    listener:
+      missing-topics-fatal: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  kafka:
+    topic: ${APP_KAFKA_TOPIC:flight-events}
+    enabled: ${APP_KAFKA_ENABLED:true}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  seed:
+    enabled: ${APP_SEED_ENABLED:true}
